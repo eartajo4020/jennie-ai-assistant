@@ -5,28 +5,54 @@ import { useState } from "react";
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAsk = () => {
+  const handleAsk = async () => {
     if (!question.trim()) {
-      setResponse("Please enter a question first.");
+      setResponse("Please enter a question.");
       return;
     }
 
-   setResponse(
-  `Thanks for your question: "${question}". Jennie will be happy to help. For detailed assistance with buying, selling, showings, or listings, please contact Jennie directly at 224-388-2478 or JArtajo@StarckRE.com.`
-);
+    try {
+      setLoading(true);
+      setResponse("");
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setResponse(data.error || "Something went wrong.");
+        return;
+      }
+
+      setResponse(data.answer);
+
+    } catch (error) {
+      setResponse("Failed connecting to AI.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 px-6 py-16">
+    <main className="min-h-screen bg-white px-6 py-16">
       <div className="max-w-4xl mx-auto">
 
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-3">
+          <h1 className="text-5xl font-bold mb-4">
             Ask Jennie AI
           </h1>
 
-          <p className="text-lg text-gray-600">
+          <p className="text-lg">
             Real Estate Broker • Hablo Español
           </p>
 
@@ -35,23 +61,21 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="border rounded-2xl p-6 shadow mb-8">
-          <h2 className="text-2xl font-semibold mb-4">
-            Ask a Question
-          </h2>
+        <div className="border rounded-2xl p-6 shadow">
 
           <input
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Type your real estate question..."
+            onChange={(e)=>setQuestion(e.target.value)}
+            placeholder="Ask a real estate question..."
             className="w-full border rounded-xl p-4 mb-4"
           />
 
           <button
             onClick={handleAsk}
+            disabled={loading}
             className="bg-black text-white px-6 py-3 rounded-xl"
           >
-            Ask Jennie AI
+            {loading ? "Thinking..." : "Ask Jennie AI"}
           </button>
 
           {response && (
@@ -59,6 +83,7 @@ export default function Home() {
               {response}
             </div>
           )}
+
         </div>
 
       </div>
