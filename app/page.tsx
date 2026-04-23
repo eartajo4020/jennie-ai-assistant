@@ -1,15 +1,27 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Home() {
+  const [question, setQuestion] = useState("");
+  const [response, setResponse] = useState("");
+
+  const handleAsk = () => {
+    if (!question.trim()) {
+      setResponse("Please enter a question first.");
+      return;
+    }
+
+    setResponse(
+      `Thanks for your question: "${question}". Jennie AI chat is being connected and will be able to answer this here soon.`
+    );
+  };
+
   return (
     <main className="min-h-screen bg-white text-gray-900 px-6 py-16">
       <div className="max-w-4xl mx-auto">
 
         <div className="text-center mb-12">
-          <img
-            src="/agent.jpg"
-            alt="Jennie Artajo"
-            className="w-40 h-40 rounded-full mx-auto mb-6 object-cover"
-          />
-
           <h1 className="text-5xl font-bold mb-3">
             Ask Jennie AI
           </h1>
@@ -29,31 +41,24 @@ export default function Home() {
           </h2>
 
           <input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
             placeholder="Type your real estate question..."
             className="w-full border rounded-xl p-4 mb-4"
           />
 
-          <button className="bg-black text-white px-6 py-3 rounded-xl">
+          <button
+            onClick={handleAsk}
+            className="bg-black text-white px-6 py-3 rounded-xl"
+          >
             Ask Jennie AI
           </button>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="border p-5 rounded-2xl">
-            What homes are available?
-          </div>
-
-          <div className="border p-5 rounded-2xl">
-            How do I buy my first home?
-          </div>
-
-          <div className="border p-5 rounded-2xl">
-            What is my home worth?
-          </div>
-
-          <div className="border p-5 rounded-2xl">
-            Can I schedule a showing?
-          </div>
+          {response && (
+            <div className="mt-6 border rounded-xl p-4 bg-gray-50">
+              {response}
+            </div>
+          )}
         </div>
 
       </div>
