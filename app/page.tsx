@@ -12,9 +12,9 @@ export default function Home() {
       return;
     }
 
-    setResponse(
-      `Thanks for your question: "${question}". Jennie AI chat is being connected and will be able to answer this here soon.`
-    );
+   setResponse(
+  `Thanks for your question: "${question}". Jennie will be happy to help. For detailed assistance with buying, selling, showings, or listings, please contact Jennie directly at 224-388-2478 or JArtajo@StarckRE.com.`
+);
   };
 
   return (
