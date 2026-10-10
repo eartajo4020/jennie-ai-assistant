@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { getBusiness } from "@/lib/businesses";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -66,6 +67,14 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
+    const business = getBusiness("homes-with-jennie");
+
+if (!business) {
+  return Response.json(
+    { error: "Business configuration not found." },
+    { status: 404 }
+  );
+}
 
     const latestMessage =
       typeof body.question === "string"
@@ -100,7 +109,15 @@ export async function POST(req: Request) {
     const systemMessage = {
       role: "system" as const,
       content: `
-You are Jennie AI, the dedicated real estate assistant for Jennie Artajo.
+You are ${business.assistantName}, the virtual assistant for ${business.businessName}.
+
+BUSINESS INFORMATION
+${business.businessDescription}
+
+SERVICES
+${business.services.join(", ")}
+
+Always identify yourself as a virtual assistant, not as the business owner.
 
 Your job is to help website visitors who are interested in buying, selling, renting, or investing in real estate. You should also naturally learn what they need so Jennie Artajo can follow up when appropriate.
 

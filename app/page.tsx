@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -19,6 +20,23 @@ type Lead = {
   summary: string;
   leadScore: string;
   nextAction: string;
+};
+
+// CONVERZA CLIENT CUSTOMIZATION
+// Change these settings when setting up a new assistant.
+// The backend is still configured for Jennie's real estate business.
+const assistantConfig = {
+  businessName: "Homes With Jennie",
+  assistantName: "Online Assistant",
+  assistantInitials: "OA",
+  industryLabel: "Real Estate Assistant",
+  greeting:
+    "Hi! I'm your online assistant. How may I help you today?",
+  placeholder: "Ask me anything...",
+  primaryColor: "#2d2925",
+  disclosure:
+    "I'm a virtual assistant. Information you share may be saved and sent to Jennie Artajo for follow-up. Please avoid sharing sensitive financial or personal information.",
+  poweredBy: "Converza",
 };
 
 const emptyLead: Lead = {
@@ -43,12 +61,16 @@ export default function Home() {
   const [chat, setChat] = useState<ChatMessage[]>([
     {
       sender: "ai",
-      text: "Hi! 👋 I'm Jennie, your AI real estate assistant. Are you looking to buy, sell, rent, or just have a few questions?",
+      text: assistantConfig.greeting,
     },
   ]);
 
-  const leadId = useRef(crypto.randomUUID());
+  const leadId = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    leadId.current = crypto.randomUUID();
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -60,7 +82,6 @@ export default function Home() {
     if (isTyping) return;
 
     const userText = message.trim();
-
     if (!userText) return;
 
     const updatedHistory: ChatMessage[] = [
@@ -99,7 +120,6 @@ export default function Home() {
               "Something went wrong. Please try again.",
           },
         ]);
-
         return;
       }
 
@@ -170,7 +190,7 @@ export default function Home() {
         ...prev,
         {
           sender: "ai",
-          text: "Connection failed.",
+          text: "Connection failed. Please try again.",
         },
       ]);
     } finally {
@@ -184,18 +204,23 @@ export default function Home() {
         <header className="border-b border-[#ebe5dc] bg-[#fffdf9] px-5 py-4 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2d2925] text-sm font-bold tracking-wide text-white">
-                JA
+              <div
+                className="flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-bold tracking-wide text-white"
+                style={{
+                  backgroundColor: assistantConfig.primaryColor,
+                }}
+              >
+                {assistantConfig.assistantInitials}
               </div>
 
               <div>
                 <h1 className="font-semibold tracking-tight text-[#252321]">
-                  Jennie AI
+                  {assistantConfig.assistantName}
                 </h1>
 
                 <div className="mt-1 flex items-center gap-2 text-xs text-[#7b756d]">
                   <span className="h-2 w-2 rounded-full bg-[#6f8c75]" />
-                  Real Estate Assistant
+                  {assistantConfig.industryLabel}
                 </div>
               </div>
             </div>
@@ -207,10 +232,7 @@ export default function Home() {
         </header>
 
         <div className="border-b border-[#ebe5dc] bg-[#f8f4ee] px-5 py-3 text-xs leading-5 text-[#6f675f] sm:px-6">
-          By continuing, you agree that information you share may
-          be saved and sent to Jennie Artajo so she can follow up
-          with you. Please avoid sharing sensitive financial or
-          personal information.
+          {assistantConfig.disclosure}
         </div>
 
         <div className="flex-1 space-y-5 overflow-y-auto bg-[#fbf8f4] p-5 sm:p-6">
@@ -236,7 +258,9 @@ export default function Home() {
                         : "border border-[#ded7ce] bg-[#f0ebe4] text-[#6f655a]"
                     }`}
                   >
-                    {isUser ? "You" : "JA"}
+                    {isUser
+                      ? "You"
+                      : assistantConfig.assistantInitials}
                   </div>
 
                   <div>
@@ -247,7 +271,9 @@ export default function Home() {
                           : "text-[#8a8177]"
                       }`}
                     >
-                      {isUser ? "You" : "Jennie AI"}
+                      {isUser
+                        ? "You"
+                        : assistantConfig.assistantName}
                     </div>
 
                     <div
@@ -269,23 +295,21 @@ export default function Home() {
             <div className="flex justify-start">
               <div className="flex items-end gap-2.5">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#ded7ce] bg-[#f0ebe4] text-[11px] font-bold text-[#6f655a]">
-                  JA
+                  {assistantConfig.assistantInitials}
                 </div>
 
                 <div>
                   <div className="mb-1.5 text-[11px] font-medium text-[#8a8177]">
-                    Jennie AI
+                    {assistantConfig.assistantName}
                   </div>
 
                   <div className="rounded-[20px] rounded-bl-md border border-[#e3ddd5] bg-[#f2eee8] px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       <span className="h-2 w-2 animate-bounce rounded-full bg-[#9f9589]" />
-
                       <span
                         className="h-2 w-2 animate-bounce rounded-full bg-[#9f9589]"
                         style={{ animationDelay: "0.15s" }}
                       />
-
                       <span
                         className="h-2 w-2 animate-bounce rounded-full bg-[#9f9589]"
                         style={{ animationDelay: "0.3s" }}
@@ -318,7 +342,7 @@ export default function Home() {
                   sendMessage();
                 }
               }}
-              placeholder="Message Jennie..."
+              placeholder={assistantConfig.placeholder}
               className="max-h-32 min-h-[48px] flex-1 resize-none rounded-2xl border border-[#ddd5cb] bg-[#faf7f2] px-4 py-3 text-sm text-[#2b2825] outline-none transition placeholder:text-[#a49a90] focus:border-[#a68a64] focus:ring-2 focus:ring-[#a68a64]/10"
             />
 
@@ -326,15 +350,18 @@ export default function Home() {
               type="button"
               onClick={sendMessage}
               disabled={isTyping || !message.trim()}
-              className="flex h-12 items-center justify-center rounded-2xl bg-[#2d2925] px-5 text-sm font-semibold text-white transition hover:bg-[#453f39] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-12 items-center justify-center rounded-2xl px-5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              style={{
+                backgroundColor: assistantConfig.primaryColor,
+              }}
             >
               Send
             </button>
           </div>
 
-          <div className="mt-2 flex items-center justify-between px-1 text-[11px] text-[#9d9389]">
-            <span>Press Enter to send</span>
-            <span>{message.length}/1000</span>
+          <div className="mt-3 text-center text-[11px] text-[#9a9086]">
+            {assistantConfig.businessName} · Powered by{" "}
+            {assistantConfig.poweredBy}
           </div>
         </div>
       </div>
